@@ -1,0 +1,14 @@
+from scipy.stats import poisson
+
+# 1. Definir los parámetros del problema
+n = 1000       # Número de autos
+p = 0.001      # Probabilidad de accidente
+lmbda = n * p  # Tasa media (lambda = 1)
+
+# 2. Calcular la probabilidad P(X >= 2)
+# Usamos la regla del complemento: 1 - P(X <= 1)
+probabilidad = 1 - poisson.cdf(1, lmbda)
+
+# 3. Imprimir el resultado
+print(f"Tasa media de accidentes (lambda): {lmbda}")
+print(f"Probabilidad de 2 o más accidentes: {probabilidad:.6f} ({probabilidad * 100:.2f}%)")
