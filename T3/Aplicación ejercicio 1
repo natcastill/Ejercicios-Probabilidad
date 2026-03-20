@@ -1,0 +1,26 @@
+from scipy.stats import binom
+
+# 1. Definir los parámetros del problema
+n = 5        # Número total de lanzamientos
+p = 1/6      # Probabilidad de éxito (sacar un 3)
+
+# 2. Calcular las probabilidades
+
+# a) Exactamente 2 veces: P(X = 2)
+# Usamos pmf (Probability Mass Function) para valores exactos
+prob_a = binom.pmf(2, n, p)
+
+# b) Máximo 1 vez: P(X <= 1)
+# Usamos cdf (Cumulative Distribution Function) para probabilidades acumuladas
+prob_b = binom.cdf(1, n, p)
+
+# c) Al menos 2 veces: P(X >= 2)
+# Por la regla del complemento: 1 - P(X <= 1)
+prob_c = 1 - binom.cdf(1, n, p)
+
+# 3. Imprimir los resultados
+print("Resultados de las probabilidades:")
+print("-" * 35)
+print(f"a) 2 veces:          {prob_a:.5f} ({prob_a * 100:.2f}%)")
+print(f"b) Máximo 1 vez:     {prob_b:.5f} ({prob_b * 100:.2f}%)")
+print(f"c) Al menos 2 veces: {prob_c:.5f} ({prob_c * 100:.2f}%)")
