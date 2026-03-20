@@ -1,0 +1,321 @@
+# ============================================================
+#  TALLER DE DISTRIBUCIONES DE PROBABILIDAD
+#  Universidad Distrital Francisco José de Caldas
+# ============================================================
+
+# ============================================================
+#  PARTE 1 — CASO DISCRETO
+# ============================================================
+
+# ------------------------------------------------------------
+#  1.1 DISTRIBUCIÓN BINOMIAL
+# ------------------------------------------------------------
+
+from scipy.stats import binom
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ── Ejercicio B-1 ────────────────────────────────────────────
+# Examen de opción múltiple: n=10 preguntas, p=1/4 por azar
+print("=" * 50)
+print("EJERCICIO B-1 — Examen opción múltiple")
+print("=" * 50)
+
+n, p = 10, 0.25
+
+p1 = binom.pmf(3, n, p)               # P(X = 3)
+p2 = 1 - binom.cdf(7, n, p)           # P(X >= 8)
+media = n * p
+var   = n * p * (1 - p)
+
+print(f"P(X=3)    = {p1:.6f}")
+print(f"P(X>=8)   = {p2:.6f}")
+print(f"E(X)      = {media}")
+print(f"Var(X)    = {var}")
+
+# ── Ejercicio B-2 ────────────────────────────────────────────
+# Línea de producción: n=15 artículos, p=0.08 defectuosos
+print("\n" + "=" * 50)
+print("EJERCICIO B-2 — Línea de producción")
+print("=" * 50)
+
+n, p = 15, 0.08
+
+p1 = binom.cdf(2, n, p)               # P(X <= 2)
+p2 = binom.pmf(0, n, p)               # P(X = 0)
+media = n * p                          # E(X) = 1.2 -> k=1
+p3 = binom.pmf(1, n, p)               # P(X = 1)
+
+print(f"P(X<=2)   = {p1:.6f}")
+print(f"P(X=0)    = {p2:.6f}")
+print(f"E(X)      = {media}")
+print(f"P(X=1)    = {p3:.6f}")
+
+# ── Aplicación Binomial ──────────────────────────────────────
+# Control de calidad en chips: n=20, p=0.05, rechazo si X > 2
+print("\n" + "=" * 50)
+print("APLICACIÓN BINOMIAL — Control de calidad chips")
+print("=" * 50)
+
+n, p = 20, 0.05
+
+p_aceptar  = binom.cdf(2, n, p)
+p_rechazar = 1 - p_aceptar
+print(f"P(aceptar)  = {p_aceptar:.6f}")
+print(f"P(rechazar) = {p_rechazar:.6f}")
+
+# Gráfica PMF
+x      = np.arange(0, n + 1)
+pmf    = binom.pmf(x, n, p)
+colors = ['tomato' if xi > 2 else 'steelblue' for xi in x]
+
+plt.figure(figsize=(9, 4))
+plt.bar(x, pmf, color=colors, edgecolor='white', linewidth=0.6)
+plt.axvline(2.5, color='red', linestyle='--', label='Umbral rechazo (X>2)')
+plt.xlabel('Número de chips defectuosos (X)')
+plt.ylabel('P(X = k)')
+plt.title('PMF Binomial — Control de Calidad (n=20, p=0.05)')
+plt.legend()
+plt.tight_layout()
+plt.savefig('binomial_aplicacion.png', dpi=150)
+plt.show()
+
+
+# ------------------------------------------------------------
+#  1.2 DISTRIBUCIÓN DE POISSON
+# ------------------------------------------------------------
+
+from scipy.stats import poisson
+
+# ── Ejercicio P-1 ────────────────────────────────────────────
+# Central telefónica: lambda=3 llamadas/minuto
+print("\n" + "=" * 50)
+print("EJERCICIO P-1 — Central telefónica")
+print("=" * 50)
+
+lam = 3
+
+p1 = poisson.pmf(5, lam)              # P(X = 5)
+p2 = poisson.cdf(2, lam)              # P(X <= 2)
+p3 = 1 - poisson.pmf(0, lam)          # P(X >= 1)
+
+print(f"P(X=5)    = {p1:.6f}")
+print(f"P(X<=2)   = {p2:.6f}")
+print(f"P(X>=1)   = {p3:.6f}")
+
+# ── Ejercicio P-2 ────────────────────────────────────────────
+# Accidentes en autopista: lambda=2 accidentes/semana
+print("\n" + "=" * 50)
+print("EJERCICIO P-2 — Accidentes en autopista")
+print("=" * 50)
+
+lam = 2
+
+p1 = poisson.pmf(4, lam)                              # P(X = 4)
+p2 = poisson.cdf(3, lam) - poisson.cdf(0, lam)       # P(1 <= X <= 3)
+p3 = poisson.pmf(0, lam)                              # P(X = 0)
+
+print(f"P(X=4)       = {p1:.6f}")
+print(f"P(1<=X<=3)   = {p2:.6f}")
+print(f"P(X=0)       = {p3:.6f}")
+
+# ── Aplicación Poisson ───────────────────────────────────────
+# Servidor web: lambda=8 solicitudes/segundo, colapso si X > 12
+print("\n" + "=" * 50)
+print("APLICACIÓN POISSON — Servidor web")
+print("=" * 50)
+
+lam = 8
+
+p_colapso = 1 - poisson.cdf(12, lam)
+p_exacta  = poisson.pmf(8, lam)
+print(f"P(colapso)  = {p_colapso:.6f}")
+print(f"P(X=8)      = {p_exacta:.6f}")
+
+# Gráfica PMF
+x      = np.arange(0, 21)
+pmf    = poisson.pmf(x, lam)
+colors = ['tomato' if xi > 12 else 'mediumseagreen' for xi in x]
+
+plt.figure(figsize=(9, 4))
+plt.bar(x, pmf, color=colors, edgecolor='white')
+plt.axvline(12.5, color='red', linestyle='--', label='Umbral colapso (X>12)')
+plt.xlabel('Solicitudes por segundo (X)')
+plt.ylabel('P(X = k)')
+plt.title('PMF Poisson — Servidor Web (lam=8)')
+plt.legend()
+plt.tight_layout()
+plt.savefig('poisson_aplicacion.png', dpi=150)
+plt.show()
+
+
+# ============================================================
+#  PARTE 2 — CASO CONTINUO
+# ============================================================
+
+# ------------------------------------------------------------
+#  2.1 DISTRIBUCIÓN NORMAL
+# ------------------------------------------------------------
+
+from scipy.stats import norm
+
+# ── Ejercicio N-1 ────────────────────────────────────────────
+# Estaturas: mu=175 cm, sigma=8 cm
+print("\n" + "=" * 50)
+print("EJERCICIO N-1 — Estaturas universitarios")
+print("=" * 50)
+
+mu, sigma = 175, 8
+
+p1  = 1 - norm.cdf(185, mu, sigma)                           # P(X > 185)
+p2  = norm.cdf(185, mu, sigma) - norm.cdf(165, mu, sigma)    # P(165 < X < 185)
+p90 = norm.ppf(0.90, mu, sigma)                              # Percentil 90
+
+print(f"P(X>185)       = {p1:.6f}")
+print(f"P(165<X<185)   = {p2:.6f}")
+print(f"Percentil 90   = {p90:.4f} cm")
+
+# ── Ejercicio N-2 ────────────────────────────────────────────
+# Peso de envases: mu=500 g, sigma=15 g
+print("\n" + "=" * 50)
+print("EJERCICIO N-2 — Peso de envases")
+print("=" * 50)
+
+mu, sigma = 500, 15
+
+p1 = norm.cdf(470, mu, sigma)          # P(X < 470)
+p2 = 1 - norm.cdf(530, mu, sigma)      # P(X > 530)
+p3 = p1 + p2                           # P(fuera de norma)
+
+print(f"P(X<470)            = {p1:.6f}")
+print(f"P(X>530)            = {p2:.6f}")
+print(f"P(fuera de norma)   = {p3:.6f}")
+
+# ── Aplicación Normal ────────────────────────────────────────
+# Puntajes examen: mu=65, sigma=12, categorías por rango
+print("\n" + "=" * 50)
+print("APLICACIÓN NORMAL — Puntajes examen nacional")
+print("=" * 50)
+
+mu, sigma = 65, 12
+
+limites   = [-np.inf, 50, 70, 85, np.inf]
+etiquetas = ['Insuficiente', 'Regular', 'Bueno', 'Excelente']
+colores   = ['#e74c3c', '#f39c12', '#2ecc71', '#3498db']
+
+probs = [norm.cdf(b, mu, sigma) - norm.cdf(a, mu, sigma)
+         for a, b in zip(limites, limites[1:])]
+
+for et, pr in zip(etiquetas, probs):
+    print(f"{et:15s}: {pr:.4f}  ({pr * 100:.2f}%)")
+
+# Curva normal con áreas coloreadas por categoría
+x = np.linspace(mu - 4 * sigma, mu + 4 * sigma, 400)
+y = norm.pdf(x, mu, sigma)
+
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(x, y, 'k', linewidth=1.5)
+for a, b, col, et in zip(limites, limites[1:], colores, etiquetas):
+    xa = max(a, x[0])
+    xb = min(b, x[-1])
+    xs = np.linspace(xa, xb, 200)
+    ax.fill_between(xs, norm.pdf(xs, mu, sigma),
+                    alpha=0.6, color=col, label=et)
+
+ax.set_xlabel('Puntaje')
+ax.set_ylabel('Densidad')
+ax.set_title('Distribución Normal — Puntajes Examen Nacional (mu=65, sigma=12)')
+ax.legend(loc='upper right')
+plt.tight_layout()
+plt.savefig('normal_aplicacion.png', dpi=150)
+plt.show()
+
+
+# ------------------------------------------------------------
+#  2.2 DISTRIBUCIÓN EXPONENCIAL
+# ------------------------------------------------------------
+
+from scipy.stats import expon
+
+# ── Ejercicio E-1 ────────────────────────────────────────────
+# Vida útil de componente: lambda=0.5 (media=2 años)
+print("\n" + "=" * 50)
+print("EJERCICIO E-1 — Vida útil componente electrónico")
+print("=" * 50)
+
+# NOTA: scipy usa el parámetro scale = 1/lambda
+lam   = 0.5
+scale = 1 / lam
+
+p1    = 1 - expon.cdf(3, scale=scale)                         # P(X > 3)
+p2    = expon.cdf(4, scale=scale) - expon.cdf(1, scale=scale) # P(1 < X < 4)
+media = scale
+var   = scale ** 2
+
+print(f"P(X>3)    = {p1:.6f}")
+print(f"P(1<X<4)  = {p2:.6f}")
+print(f"E(X)      = {media} años")
+print(f"Var(X)    = {var} años²")
+
+# ── Ejercicio E-2 ────────────────────────────────────────────
+# Tiempo de atención bancaria: media=4 min → lambda=0.25
+print("\n" + "=" * 50)
+print("EJERCICIO E-2 — Atención en ventanilla bancaria")
+print("=" * 50)
+
+lam   = 0.25
+scale = 1 / lam
+
+p1  = expon.cdf(2, scale=scale)        # P(X < 2)
+p2  = 1 - expon.cdf(6, scale=scale)   # P(X > 6)
+t80 = expon.ppf(0.80, scale=scale)     # Percentil 80
+
+print(f"P(X<2)    = {p1:.6f}")
+print(f"P(X>6)    = {p2:.6f}")
+print(f"t(80%)    = {t80:.4f} min")
+
+# ── Aplicación Exponencial ───────────────────────────────────
+# Mantenimiento industrial: lambda=0.1 fallas/hora (media=10 h)
+print("\n" + "=" * 50)
+print("APLICACIÓN EXPONENCIAL — Mantenimiento industrial")
+print("=" * 50)
+
+lam   = 0.1
+scale = 1 / lam
+
+p1 = 1 - expon.cdf(15, scale=scale)   # P(X > 15)
+p2 = expon.cdf(8, scale=scale)        # P(X <= 8) → garantía
+
+print(f"P(X>15)   = {p1:.6f}")
+print(f"P(X<=8)   = {p2:.6f}  ({p2 * 100:.2f}%)")
+
+# Gráfica PDF y CDF lado a lado
+x   = np.linspace(0, 50, 400)
+pdf = expon.pdf(x, scale=scale)
+cdf = expon.cdf(x, scale=scale)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+
+# PDF con área de garantía destacada
+ax1.plot(x, pdf, color='darkorange', linewidth=2)
+xs = np.linspace(0, 8, 200)
+ax1.fill_between(xs, expon.pdf(xs, scale=scale),
+                 alpha=0.4, color='darkorange', label='Garantia (0-8 h)')
+ax1.axvline(15, color='red', linestyle='--', label='X=15 h')
+ax1.set_xlabel('Tiempo (h)')
+ax1.set_ylabel('f(x)')
+ax1.set_title('PDF Exponencial (lam=0.1)')
+ax1.legend()
+
+# CDF
+ax2.plot(x, cdf, color='darkorange', linewidth=2)
+ax2.axhline(p2, color='gray', linestyle=':', label=f'{p2*100:.1f}%')
+ax2.axvline(8, color='darkorange', linestyle='--', label='X=8 h')
+ax2.set_xlabel('Tiempo (h)')
+ax2.set_ylabel('F(x)')
+ax2.set_title('CDF Exponencial (lam=0.1)')
+ax2.legend()
+
+plt.tight_layout()
+plt.savefig('exponencial_aplicacion.png', dpi=150)
+plt.show()
